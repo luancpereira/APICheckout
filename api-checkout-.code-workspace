@@ -1,0 +1,21 @@
+{
+  "folders": [
+    {
+      "path": "core"
+    },
+    {
+      "path": "apis/public",
+      "name": "api_public"
+    },
+    {
+      "path": "apis/commons",
+      "name": "api_commons"
+    },
+    {
+      "path": "dev"
+    },
+    {
+      "path": "."
+    }
+  ]
+}
