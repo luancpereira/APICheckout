@@ -117,7 +117,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/checkout/transactions/{transactionID}": {
+        "/api/checkout/transactions/{transactionID}/country/{country}": {
             "get": {
                 "produces": [
                     "application/json"
@@ -130,6 +130,13 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "transactionID",
                         "name": "transactionID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "country",
+                        "name": "country",
                         "in": "path",
                         "required": true
                     }

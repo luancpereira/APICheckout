@@ -56,16 +56,22 @@ funcs for gets
 //	@Tags		Checkout Orders
 //	@Produce	json
 //	@Param		transactionID	path		int64	true	"transactionID"
+//	@Param		country			path		string	true	"country"
 //	@Success	200				{object}	response.GetTransactionsByID
 //	@Failure	400				{object}	response.Exception
-//	@Router		/api/checkout/transactions/{transactionID} [get]
+//	@Router		/api/checkout/transactions/{transactionID}/country/{country} [get]
 func (Checkout) GetByID(ctx *gin.Context) {
 	transactionID, err := GetPathParamInt64(ctx, "transactionID", true)
 	if err != nil {
 		return
 	}
 
-	model, err := service.Checkout{}.GetByID(transactionID)
+	country, err := GetPathParamString(ctx, "country", true)
+	if err != nil {
+		return
+	}
+
+	model, err := service.Checkout{}.GetByID(transactionID, country)
 	if err != nil {
 		ResponseBadRequest(ctx, err)
 		return

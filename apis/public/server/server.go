@@ -56,6 +56,6 @@ func (s Server) setupRouterV1() {
 
 	freeRoutes.POST("/api/checkout", checkout.InsertTransaction)
 	freeRoutes.GET("/api/checkout/transactions", checkout.GetList)
-	freeRoutes.GET("/api/checkout/transactions/:transactionID", checkout.GetByID)
+	freeRoutes.GET("/api/checkout/transactions/:transactionID/country/:country", checkout.GetByID)
 
 }
