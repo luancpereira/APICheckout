@@ -1,5 +1,7 @@
 {
   "error.unmapped": "unmapped error message:",
   "error.request.body.invalid": "invalid request body",
-  "error.database": "An error occurred in the database with the message:"
+  "error.database": "An error occurred in the database with the message:",
+  "error.not.found.value.record": "Value cannot be converted to the currency."
+  
 }

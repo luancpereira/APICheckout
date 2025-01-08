@@ -13,6 +13,8 @@ import (
 	"github.com/luancpereira/APICheckout/core/database"
 	"github.com/luancpereira/APICheckout/core/database/sqlc"
 	coreError "github.com/luancpereira/APICheckout/core/errors"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type Checkout struct{}
@@ -60,28 +62,22 @@ funcs for creations
 funcs for gets
 ******/
 
-func (Checkout) GetByID(transactionID int64) (transaction TransactionDetail, err error) {
+func (Checkout) GetByID(transactionID int64, country string) (transaction TransactionDetail, err error) {
 	transactionDetail, err := database.DB_QUERIER.SelectTransactionByID(context.Background(), transactionID)
 	if err != nil {
 		err = database.Utils{}.CoreErrorDatabase(err)
 		return
 	}
+	formattedDate := transactionDetail.TransactionDate.Format("2006-01-02")
+	url := "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange?filter=country:eq:" + CapitalizeFirstLetter(country) + ",effective_date:lt:" + formattedDate
 
 	var response Response
-	err = GetEntity("https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange?filter=country:eq:Brazil,record_calendar_year:eq:2024", map[string]string{}, &response)
+	err = GetEntity(url, map[string]string{}, &response)
 	if err != nil {
 		return
 	}
 
-	dateStr := "2025-01-06"
-
-	targetDate, err := time.Parse("2006-01-02", dateStr)
-	if err != nil {
-		fmt.Println("Erro ao converter a string para time:", err)
-		return
-	}
-
-	closestRecord, err := FindRegistryWithDateCloset(response.Data, targetDate)
+	closestRecord, err := FindRegistryWithDateCloset(response.Data, transactionDetail.TransactionDate)
 	if err != nil {
 		return
 	}
@@ -93,7 +89,7 @@ func (Checkout) GetByID(transactionID int64) (transaction TransactionDetail, err
 
 	transaction = TransactionDetail{
 		SelectTransactionByIDRow:                transactionDetail,
-		TransactionValueConvertedToWishCurrency: exchangeRate,
+		TransactionValueConvertedToWishCurrency: math.Round(transactionDetail.TransactionValue*exchangeRate*100) / 100,
 	}
 
 	return
@@ -152,6 +148,35 @@ func (Checkout) validateTrasactionValue(value float64) (err error) {
 	if value <= 0 {
 		err = coreError.New("error.value.not.positive")
 		return
+	}
+
+	return
+}
+
+func FindRegistryWithDateCloset(records []Record, targetDate time.Time) (closestRecord Record, err error) {
+	var minDiff time.Duration = time.Duration(math.MaxInt64)
+
+	const maxDuration = 182 * 24 * time.Hour
+
+	for _, record := range records {
+		recordDate, err := time.Parse("2006-01-02", record.EffectiveDate)
+		if err != nil {
+			continue
+		}
+
+		diff := recordDate.Sub(targetDate)
+		if diff < 0 {
+			diff = -diff
+		}
+
+		if diff < minDiff && recordDate.Before(targetDate) && diff <= maxDuration {
+			minDiff = diff
+			closestRecord = record
+		}
+	}
+
+	if minDiff == time.Duration(math.MaxInt64) {
+		err = coreError.New("error.not.found.value.record")
 	}
 
 	return
@@ -223,33 +248,8 @@ func GetEntity(url string, headers map[string]string, target interface{}) error 
 	return nil
 }
 
-func FindRegistryWithDateCloset(records []Record, targetDate time.Time) (closestRecord Record, err error) {
-	var minDiff time.Duration = time.Duration(math.MaxInt64)
-
-	const maxDuration = 182 * 24 * time.Hour
-
-	for _, record := range records {
-		recordDate, err := time.Parse("2006-01-02", record.EffectiveDate)
-		if err != nil {
-			continue
-		}
-
-		diff := recordDate.Sub(targetDate)
-		if diff < 0 {
-			diff = -diff
-		}
-
-		if diff < minDiff && recordDate.Before(targetDate) && diff <= maxDuration {
-			minDiff = diff
-			closestRecord = record
-		}
-	}
-
-	if minDiff == time.Duration(math.MaxInt64) {
-		err = fmt.Errorf("nenhum registro válido encontrado")
-	}
-
-	return
+func CapitalizeFirstLetter(text string) string {
+	return cases.Title(language.Und, cases.Compact).String(text)
 }
 
 /*****
