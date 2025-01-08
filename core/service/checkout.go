@@ -61,17 +61,17 @@ funcs for gets
 
 func (Checkout) GetByID(transactionID int64) (transaction sqlc.SelectTransactionByIDRow, err error) {
 
-	// var response Response
-	// err = GetEntity("https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange?filter=country:eq:Brazil,record_calendar_year:eq:2024", map[string]string{}, &response)
-	// if err != nil {
-	// 	return
-	// }
-
 	transaction, err = database.DB_QUERIER.SelectTransactionByID(context.Background(), transactionID)
 	if err != nil {
 		err = database.Utils{}.CoreErrorDatabase(err)
 		return
 	}
+
+	// var response Response
+	// err = GetEntity("https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange?filter=country:eq:Brazil,record_calendar_year:eq:2024", map[string]string{}, &response)
+	// if err != nil {
+	// 	return
+	// }
 
 	return
 }
