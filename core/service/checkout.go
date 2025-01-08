@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/jinzhu/copier"
@@ -59,19 +60,41 @@ funcs for creations
 funcs for gets
 ******/
 
-func (Checkout) GetByID(transactionID int64) (transaction sqlc.SelectTransactionByIDRow, err error) {
-
-	transaction, err = database.DB_QUERIER.SelectTransactionByID(context.Background(), transactionID)
+func (Checkout) GetByID(transactionID int64) (transaction TransactionDetail, err error) {
+	transactionDetail, err := database.DB_QUERIER.SelectTransactionByID(context.Background(), transactionID)
 	if err != nil {
 		err = database.Utils{}.CoreErrorDatabase(err)
 		return
 	}
 
-	// var response Response
-	// err = GetEntity("https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange?filter=country:eq:Brazil,record_calendar_year:eq:2024", map[string]string{}, &response)
-	// if err != nil {
-	// 	return
-	// }
+	var response Response
+	err = GetEntity("https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange?filter=country:eq:Brazil,record_calendar_year:eq:2024", map[string]string{}, &response)
+	if err != nil {
+		return
+	}
+
+	dateStr := "2025-01-06"
+
+	targetDate, err := time.Parse("2006-01-02", dateStr)
+	if err != nil {
+		fmt.Println("Erro ao converter a string para time:", err)
+		return
+	}
+
+	closestRecord, err := FindRegistryWithDateCloset(response.Data, targetDate)
+	if err != nil {
+		return
+	}
+
+	exchangeRate, err := strconv.ParseFloat(closestRecord.ExchangeRate, 64)
+	if err != nil {
+		return transaction, fmt.Errorf("erro ao converter ExchangeRate para float64: %w", err)
+	}
+
+	transaction = TransactionDetail{
+		SelectTransactionByIDRow:                transactionDetail,
+		TransactionValueConvertedToWishCurrency: exchangeRate,
+	}
 
 	return
 }
@@ -142,6 +165,11 @@ funcs for validations
 other funcs
 ******/
 
+type TransactionDetail struct {
+	sqlc.SelectTransactionByIDRow
+	TransactionValueConvertedToWishCurrency float64
+}
+
 type Record struct {
 	RecordDate            string `json:"record_date"`
 	Country               string `json:"country"`
@@ -193,6 +221,35 @@ func GetEntity(url string, headers map[string]string, target interface{}) error 
 	}
 
 	return nil
+}
+
+func FindRegistryWithDateCloset(records []Record, targetDate time.Time) (closestRecord Record, err error) {
+	var minDiff time.Duration = time.Duration(math.MaxInt64)
+
+	const maxDuration = 182 * 24 * time.Hour
+
+	for _, record := range records {
+		recordDate, err := time.Parse("2006-01-02", record.EffectiveDate)
+		if err != nil {
+			continue
+		}
+
+		diff := recordDate.Sub(targetDate)
+		if diff < 0 {
+			diff = -diff
+		}
+
+		if diff < minDiff && recordDate.Before(targetDate) && diff <= maxDuration {
+			minDiff = diff
+			closestRecord = record
+		}
+	}
+
+	if minDiff == time.Duration(math.MaxInt64) {
+		err = fmt.Errorf("nenhum registro válido encontrado")
+	}
+
+	return
 }
 
 /*****

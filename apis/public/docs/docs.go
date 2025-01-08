@@ -213,6 +213,9 @@ const docTemplate = `{
                 },
                 "transaction_value": {
                     "type": "number"
+                },
+                "transaction_value_converted_to_wish_currency": {
+                    "type": "number"
                 }
             }
         },
