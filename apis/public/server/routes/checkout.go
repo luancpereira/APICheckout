@@ -1,10 +1,12 @@
 package routes
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
-	commonsServer "github.com/luancpereira/APICheckout/apis/commons/server"
 	"github.com/luancpereira/APICheckout/apis/public/server/model/request"
 	"github.com/luancpereira/APICheckout/apis/public/server/model/response"
+	coreError "github.com/luancpereira/APICheckout/core/errors"
 	"github.com/luancpereira/APICheckout/core/service"
 )
 
@@ -24,18 +26,18 @@ funcs for posts
 //	@Router		/api/checkout [post]
 func (Checkout) InsertTransaction(ctx *gin.Context) {
 	var req request.InsertTransaction
-	err := commonsServer.Param{}.GetBody(ctx, &req)
+	err := GetBody(ctx, &req)
 	if err != nil {
 		return
 	}
 
 	ID, err := service.Checkout{}.CreateTransaction(req.Description, req.TransactionDate, req.TransactionValue)
 	if err != nil {
-		commonsServer.Response{}.ResponseBadRequest(ctx, err)
+		ResponseBadRequest(ctx, err)
 		return
 	}
 
-	commonsServer.Response{}.ResponseCreated(ctx, ID)
+	ResponseCreated(ctx, ID)
 }
 
 /*****
@@ -56,7 +58,7 @@ funcs for gets
 func (Checkout) GetList(ctx *gin.Context) {
 	models, total, err := service.Checkout{}.GetList()
 	if err != nil {
-		commonsServer.Response{}.ResponseBadRequest(ctx, err)
+		ResponseBadRequest(ctx, err)
 		return
 	}
 
@@ -71,9 +73,62 @@ func (Checkout) GetList(ctx *gin.Context) {
 		})
 	}
 
-	commonsServer.Response{}.ResponseListOk(ctx, res, total)
+	ResponseListOk(ctx, res, total)
 }
 
 /*****
 funcs for gets
+******/
+
+/*****
+other funcs
+******/
+
+func GetBody(ctx *gin.Context, obj any) (err error) {
+	err = ParseBody(ctx, obj)
+	if err != nil {
+		ResponseBadRequest(ctx, err)
+		return
+	}
+
+	return
+}
+
+func ParseBody(ctx *gin.Context, obj any) (err error) {
+	err = ctx.ShouldBindJSON(obj)
+	if err != nil {
+		err = coreError.New("error.request.body.invalid", err.Error())
+		return
+	}
+
+	return
+}
+
+func ResponseListOk(ctx *gin.Context, bodyResponse any, total int64) {
+	var list response.List
+
+	list.Pagination = response.Pagination{Total: total}
+	list.Data = bodyResponse
+
+	ctx.JSON(http.StatusOK, list)
+}
+
+func ResponseCreated(ctx *gin.Context, ID int64) {
+	bodyResponse := response.Created{ID: ID}
+
+	ResponseCreatedBody(ctx, bodyResponse)
+}
+
+func ResponseCreatedBody(ctx *gin.Context, bodyResponse any) {
+	ctx.JSON(http.StatusCreated, bodyResponse)
+}
+
+func ResponseBadRequest(ctx *gin.Context, err interface{}) {
+	errOut := coreError.ConvertTo(err)
+
+	ctx.AbortWithStatusJSON(http.StatusBadRequest, errOut)
+}
+
+/*****
+other funcs
 ******/

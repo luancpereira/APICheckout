@@ -1,7 +1,5 @@
 package response
 
-import "github.com/google/uuid"
-
 type List struct {
 	Pagination Pagination `json:"pagination"`
 	Data       any        `json:"data"`
@@ -12,7 +10,7 @@ type Pagination struct {
 }
 
 type Created struct {
-	ID uuid.UUID `json:"id"`
+	ID int64 `json:"id"`
 }
 
 type Exception struct {

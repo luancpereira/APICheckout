@@ -5,15 +5,13 @@ import (
 	"github.com/luancpereira/APICheckout/apis/public/server"
 	"github.com/luancpereira/APICheckout/core/database"
 	"github.com/luancpereira/APICheckout/core/errors"
-
-	commonsConfig "github.com/luancpereira/APICheckout/apis/commons/config"
 )
 
 func init() {
 	errors.Factory{}.Start()
 	database.Config{}.Start()
 
-	docs.SwaggerInfo.Host = commonsConfig.SWAGGER_SERVER_HOST
+	docs.SwaggerInfo.Host = "localhost:9000"
 }
 
 //	@title			API Checkout

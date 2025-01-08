@@ -1,10 +1,11 @@
 package server
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	commonsConfig "github.com/luancpereira/APICheckout/apis/commons/config"
-	commonsServer "github.com/luancpereira/APICheckout/apis/commons/server"
 	"github.com/luancpereira/APICheckout/apis/public/server/routes"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Server struct {
@@ -12,13 +13,29 @@ type Server struct {
 	Router *gin.Engine
 }
 
+// Setups
+
+func SetupCORS(router *gin.Engine) {
+	router.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+		AllowHeaders: []string{"Origin", "Content-Length", "Content-Type", "Accept", "Authorization"},
+	}))
+}
+
+func SetupSwagger(router *gin.Engine) {
+	router.GET("/docs/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+}
+
+// Setups
+
 func NewServer() (s Server) {
 
-	s.Port = commonsConfig.SERVER_PORT
+	s.Port = "9000"
 	s.Router = gin.Default()
 
-	commonsServer.Server{}.SetupCORS(s.Router)
-	commonsServer.Server{}.SetupSwagger(s.Router)
+	SetupCORS(s.Router)
+	SetupSwagger(s.Router)
 	s.setupRouterV1()
 
 	return
