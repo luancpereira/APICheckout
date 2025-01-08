@@ -30,8 +30,8 @@ SELECT
 FROM
     "order"
 WHERE
-	(CASE WHEN @min_date::VARCHAR <> '' THEN transaction_date::DATE >= @min_date::DATE ELSE TRUE END)
-    AND (CASE WHEN @max_date::VARCHAR <> '' THEN transaction_date::DATE <= @max_date::DATE ELSE TRUE END)
+	(CASE WHEN @transaction_date::VARCHAR <> '' THEN transaction_date::DATE >= @transaction_date::DATE ELSE TRUE END)
+    AND (CASE WHEN @transaction_date::VARCHAR <> '' THEN transaction_date::DATE <= @transaction_date::DATE ELSE TRUE END)
 LIMIT $1::BIGINT
 OFFSET $2::BIGINT;
 
@@ -41,11 +41,12 @@ SELECT
 FROM
     "order"
 WHERE
-	(CASE WHEN @min_date::VARCHAR <> '' THEN transaction_date::DATE >= @min_date::DATE ELSE TRUE END)
-    AND (CASE WHEN @max_date::VARCHAR <> '' THEN transaction_date::DATE <= @max_date::DATE ELSE TRUE END);
+	(CASE WHEN @transaction_date::VARCHAR <> '' THEN transaction_date::DATE >= @transaction_date::DATE ELSE TRUE END)
+    AND (CASE WHEN @transaction_date::VARCHAR <> '' THEN transaction_date::DATE <= @transaction_date::DATE ELSE TRUE END);
 
 -- name: SelectTransactionByID :one
 SELECT 
+    id,
 	description,
     transaction_date::TIMESTAMP AS transaction_date,
     transaction_value

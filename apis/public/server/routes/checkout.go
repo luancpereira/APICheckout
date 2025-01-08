@@ -91,16 +91,27 @@ func (Checkout) GetByID(ctx *gin.Context) {
 //
 //	@Tags		Checkout Orders
 //	@Produce	json
-//	@Param		limit			query		int32	false	"limit min 1"	default(10)
-//	@Param		offset			query		int32	false	"offset min 0"	default(0)
-//	@Param		filter_min_date	query		string	false	"filter_min_date"
-//	@Param		filter_max_date	query		string	false	"filter_max_date"
-//	@Success	200				{object}	response.List{data=[]response.GetTransactions}
-//	@Failure	400				{object}	response.Exception
-//	@Router		/api/checkout/transactions [get]
+//	@Param		country					path		string	true	"country"
+//	@Param		limit					query		int32	false	"limit min 1"	default(10)
+//	@Param		offset					query		int32	false	"offset min 0"	default(0)
+//	@Param		filter_transaction_date	query		string	true	"filter_transaction_date"
+//	@Success	200						{object}	response.List{data=[]response.GetTransactions}
+//	@Failure	400						{object}	response.Exception
+//	@Router		/api/checkout/transactions/country/{country} [get]
 func (Checkout) GetList(ctx *gin.Context) {
+	country, err := GetPathParamString(ctx, "country", true)
+	if err != nil {
+		return
+	}
+
 	filters, _, limit, offset := GetQueryParam(ctx)
-	models, total, err := service.Checkout{}.GetList(filters, limit, offset)
+	filterTransactionDate := filters["transaction_date"]
+	if filterTransactionDate == "" {
+		ResponseBadRequest(ctx, coreError.New("error.transaction.date.required"))
+		return
+	}
+
+	models, total, err := service.Checkout{}.GetList(filters, limit, offset, country)
 	if err != nil {
 		ResponseBadRequest(ctx, err)
 		return
@@ -110,10 +121,11 @@ func (Checkout) GetList(ctx *gin.Context) {
 
 	for _, model := range models {
 		res = append(res, response.GetTransactions{
-			ID:               model.ID,
-			Description:      model.Description,
-			TransactionDate:  model.TransactionDate,
-			TransactionValue: model.TransactionValue,
+			ID:                                      model.ID,
+			Description:                             model.Description,
+			TransactionDate:                         model.TransactionDate,
+			TransactionValue:                        model.TransactionValue,
+			TransactionValueConvertedToWishCurrency: model.TransactionValueConvertedToWishCurrency,
 		})
 	}
 

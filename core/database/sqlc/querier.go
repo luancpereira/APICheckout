@@ -21,7 +21,7 @@ type Querier interface {
 	//-- SELECTS ----
 	//---------------
 	SelectTransactions(ctx context.Context, arg SelectTransactionsParams) ([]SelectTransactionsRow, error)
-	SelectTransactionsTotal(ctx context.Context, arg SelectTransactionsTotalParams) (int64, error)
+	SelectTransactionsTotal(ctx context.Context, transactionDate string) (int64, error)
 }
 
 var _ Querier = (*Queries)(nil)

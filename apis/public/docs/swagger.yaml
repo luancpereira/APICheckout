@@ -30,11 +30,15 @@ definitions:
         type: string
       transaction_value:
         type: number
+      transaction_value_converted_to_wish_currency:
+        type: number
     type: object
   response.GetTransactionsByID:
     properties:
       description:
         type: string
+      id:
+        type: integer
       transaction_date:
         type: string
       transaction_value:
@@ -81,47 +85,6 @@ paths:
             $ref: '#/definitions/response.Exception'
       tags:
       - Checkout Orders
-  /api/checkout/transactions:
-    get:
-      parameters:
-      - default: 10
-        description: limit min 1
-        in: query
-        name: limit
-        type: integer
-      - default: 0
-        description: offset min 0
-        in: query
-        name: offset
-        type: integer
-      - description: filter_min_date
-        in: query
-        name: filter_min_date
-        type: string
-      - description: filter_max_date
-        in: query
-        name: filter_max_date
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.List'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/response.GetTransactions'
-                  type: array
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.Exception'
-      tags:
-      - Checkout Orders
   /api/checkout/transactions/{transactionID}/country/{country}:
     get:
       parameters:
@@ -142,6 +105,49 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.GetTransactionsByID'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Exception'
+      tags:
+      - Checkout Orders
+  /api/checkout/transactions/country/{country}:
+    get:
+      parameters:
+      - description: country
+        in: path
+        name: country
+        required: true
+        type: string
+      - default: 10
+        description: limit min 1
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: offset min 0
+        in: query
+        name: offset
+        type: integer
+      - description: filter_transaction_date
+        in: query
+        name: filter_transaction_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.List'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.GetTransactions'
+                  type: array
+              type: object
         "400":
           description: Bad Request
           schema:

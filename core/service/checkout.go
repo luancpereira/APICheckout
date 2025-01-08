@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jinzhu/copier"
 	"github.com/luancpereira/APICheckout/core/database"
 	"github.com/luancpereira/APICheckout/core/database/sqlc"
 	coreError "github.com/luancpereira/APICheckout/core/errors"
@@ -68,23 +67,11 @@ func (Checkout) GetByID(transactionID int64, country string) (transaction Transa
 		err = database.Utils{}.CoreErrorDatabase(err)
 		return
 	}
-	formattedDate := transactionDetail.TransactionDate.Format("2006-01-02")
-	url := "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange?filter=country:eq:" + CapitalizeFirstLetter(country) + ",effective_date:lt:" + formattedDate
 
-	var response Response
-	err = GetEntity(url, map[string]string{}, &response)
+	exchangeRate, err := getExchangeRate(transactionDetail.TransactionDate, country)
 	if err != nil {
+		err = coreError.New("error.get.exchange.rate")
 		return
-	}
-
-	closestRecord, err := FindRegistryWithDateCloset(response.Data, transactionDetail.TransactionDate)
-	if err != nil {
-		return
-	}
-
-	exchangeRate, err := strconv.ParseFloat(closestRecord.ExchangeRate, 64)
-	if err != nil {
-		return transaction, fmt.Errorf("erro ao converter ExchangeRate para float64: %w", err)
 	}
 
 	transaction = TransactionDetail{
@@ -95,31 +82,72 @@ func (Checkout) GetByID(transactionID int64, country string) (transaction Transa
 	return
 }
 
-func (Checkout) GetList(filters map[string]string, limit, offset int64) (models []sqlc.SelectTransactionsRow, total int64, err error) {
-
+func (Checkout) GetList(filters map[string]string, limit, offset int64, country string) (models []TransactionDetailList, total int64, err error) {
 	params := sqlc.SelectTransactionsParams{
-		Column1: limit,
-		Column2: offset,
-		MinDate: filters["min_date"],
-		MaxDate: filters["max_date"],
+		Column1:         limit,
+		Column2:         offset,
+		TransactionDate: filters["transaction_date"],
 	}
 
-	models, err = database.DB_QUERIER.SelectTransactions(context.Background(), params)
+	transactions, err := database.DB_QUERIER.SelectTransactions(context.Background(), params)
 	if err != nil {
 		err = database.Utils{}.CoreErrorDatabase(err)
 		return
 	}
 
-	var totalParams sqlc.SelectTransactionsTotalParams
-	copier.Copy(&totalParams, params)
+	parsedDate, _ := time.Parse("2006-01-02", filters["transaction_date"])
 
-	total, err = database.DB_QUERIER.SelectTransactionsTotal(context.Background(), totalParams)
+	exchangeRate, err := getExchangeRate(parsedDate, country)
+
+	if err != nil {
+		err = coreError.New("error.get.exchange.rate")
+		return
+	}
+
+	var transactionDetailList []TransactionDetailList
+
+	for _, transaction := range transactions {
+
+		transactionDetail := TransactionDetailList{
+			SelectTransactionsRow:                   transaction,
+			TransactionValueConvertedToWishCurrency: math.Round(transaction.TransactionValue*exchangeRate*100) / 100,
+		}
+
+		transactionDetailList = append(transactionDetailList, transactionDetail)
+	}
+
+	models = transactionDetailList
+
+	total, err = database.DB_QUERIER.SelectTransactionsTotal(context.Background(), filters["transaction_date"])
 	if err != nil {
 		err = database.Utils{}.CoreErrorDatabase(err)
 		return
 	}
 
 	return
+}
+
+func getExchangeRate(transactionDate time.Time, country string) (float64, error) {
+	formattedDate := transactionDate.Format("2006-01-02")
+	url := "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange?filter=country:eq:" + CapitalizeFirstLetter(country) + ",effective_date:lte:" + formattedDate
+
+	var response Response
+	err := GetEntity(url, map[string]string{}, &response)
+	if err != nil {
+		return 0, err
+	}
+
+	closestRecord, err := FindRegistryWithDateCloset(response.Data, transactionDate)
+	if err != nil {
+		return 0, err
+	}
+
+	exchangeRate, err := strconv.ParseFloat(closestRecord.ExchangeRate, 64)
+	if err != nil {
+		return 0, fmt.Errorf("erro ao converter ExchangeRate para float64: %w", err)
+	}
+
+	return exchangeRate, nil
 }
 
 /*****
@@ -192,6 +220,11 @@ other funcs
 
 type TransactionDetail struct {
 	sqlc.SelectTransactionByIDRow
+	TransactionValueConvertedToWishCurrency float64
+}
+
+type TransactionDetailList struct {
+	sqlc.SelectTransactionsRow
 	TransactionValueConvertedToWishCurrency float64
 }
 

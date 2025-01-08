@@ -41,6 +41,7 @@ func (q *Queries) InsertTransaction(ctx context.Context, arg InsertTransactionPa
 
 const selectTransactionByID = `-- name: SelectTransactionByID :one
 SELECT 
+    id,
 	description,
     transaction_date::TIMESTAMP AS transaction_date,
     transaction_value
@@ -51,6 +52,7 @@ WHERE
 `
 
 type SelectTransactionByIDRow struct {
+	ID               int64
 	Description      string
 	TransactionDate  time.Time
 	TransactionValue float64
@@ -59,7 +61,12 @@ type SelectTransactionByIDRow struct {
 func (q *Queries) SelectTransactionByID(ctx context.Context, id int64) (SelectTransactionByIDRow, error) {
 	row := q.queryRow(ctx, q.selectTransactionByIDStmt, selectTransactionByID, id)
 	var i SelectTransactionByIDRow
-	err := row.Scan(&i.Description, &i.TransactionDate, &i.TransactionValue)
+	err := row.Scan(
+		&i.ID,
+		&i.Description,
+		&i.TransactionDate,
+		&i.TransactionValue,
+	)
 	return i, err
 }
 
@@ -75,16 +82,15 @@ FROM
     "order"
 WHERE
 	(CASE WHEN $3::VARCHAR <> '' THEN transaction_date::DATE >= $3::DATE ELSE TRUE END)
-    AND (CASE WHEN $4::VARCHAR <> '' THEN transaction_date::DATE <= $4::DATE ELSE TRUE END)
+    AND (CASE WHEN $3::VARCHAR <> '' THEN transaction_date::DATE <= $3::DATE ELSE TRUE END)
 LIMIT $1::BIGINT
 OFFSET $2::BIGINT
 `
 
 type SelectTransactionsParams struct {
-	Column1 int64
-	Column2 int64
-	MinDate string
-	MaxDate string
+	Column1         int64
+	Column2         int64
+	TransactionDate string
 }
 
 type SelectTransactionsRow struct {
@@ -101,12 +107,7 @@ type SelectTransactionsRow struct {
 // -- SELECTS ----
 // ---------------
 func (q *Queries) SelectTransactions(ctx context.Context, arg SelectTransactionsParams) ([]SelectTransactionsRow, error) {
-	rows, err := q.query(ctx, q.selectTransactionsStmt, selectTransactions,
-		arg.Column1,
-		arg.Column2,
-		arg.MinDate,
-		arg.MaxDate,
-	)
+	rows, err := q.query(ctx, q.selectTransactionsStmt, selectTransactions, arg.Column1, arg.Column2, arg.TransactionDate)
 	if err != nil {
 		return nil, err
 	}
@@ -140,16 +141,11 @@ FROM
     "order"
 WHERE
 	(CASE WHEN $1::VARCHAR <> '' THEN transaction_date::DATE >= $1::DATE ELSE TRUE END)
-    AND (CASE WHEN $2::VARCHAR <> '' THEN transaction_date::DATE <= $2::DATE ELSE TRUE END)
+    AND (CASE WHEN $1::VARCHAR <> '' THEN transaction_date::DATE <= $1::DATE ELSE TRUE END)
 `
 
-type SelectTransactionsTotalParams struct {
-	MinDate string
-	MaxDate string
-}
-
-func (q *Queries) SelectTransactionsTotal(ctx context.Context, arg SelectTransactionsTotalParams) (int64, error) {
-	row := q.queryRow(ctx, q.selectTransactionsTotalStmt, selectTransactionsTotal, arg.MinDate, arg.MaxDate)
+func (q *Queries) SelectTransactionsTotal(ctx context.Context, transactionDate string) (int64, error) {
+	row := q.queryRow(ctx, q.selectTransactionsTotalStmt, selectTransactionsTotal, transactionDate)
 	var total int64
 	err := row.Scan(&total)
 	return total, err

@@ -50,7 +50,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/checkout/transactions": {
+        "/api/checkout/transactions/country/{country}": {
             "get": {
                 "produces": [
                     "application/json"
@@ -59,6 +59,13 @@ const docTemplate = `{
                     "Checkout Orders"
                 ],
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "country",
+                        "name": "country",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "default": 10,
@@ -75,15 +82,10 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "filter_min_date",
-                        "name": "filter_min_date",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "filter_max_date",
-                        "name": "filter_max_date",
-                        "in": "query"
+                        "description": "filter_transaction_date",
+                        "name": "filter_transaction_date",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -206,6 +208,9 @@ const docTemplate = `{
                 },
                 "transaction_value": {
                     "type": "number"
+                },
+                "transaction_value_converted_to_wish_currency": {
+                    "type": "number"
                 }
             }
         },
@@ -214,6 +219,9 @@ const docTemplate = `{
             "properties": {
                 "description": {
                     "type": "string"
+                },
+                "id": {
+                    "type": "integer"
                 },
                 "transaction_date": {
                     "type": "string"
