@@ -7,12 +7,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// Mock da função ou dependência usada pela Checkout (se necessário)
 type MockCheckout struct{}
 
 func (m *MockCheckout) CreateTransaction(description string, transactionDate time.Time, transactionValue float64) (int64, error) {
-	// Mock da função CreateTransaction
-	return 12345, nil // Retorna um ID fictício de transação e nenhum erro
+	return 12345, nil
 }
 
 func TestCreateTransaction(t *testing.T) {
