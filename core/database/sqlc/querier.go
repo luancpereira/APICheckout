@@ -13,14 +13,15 @@ type Querier interface {
 	//-- INSERTS ----
 	//---------------
 	InsertTransaction(ctx context.Context, arg InsertTransactionParams) (int64, error)
+	SelectTransactionByID(ctx context.Context, id int64) (SelectTransactionByIDRow, error)
 	//---------------
 	//-- INSERTS ----
 	//---------------
 	//---------------
 	//-- SELECTS ----
 	//---------------
-	SelectTransactions(ctx context.Context) ([]SelectTransactionsRow, error)
-	SelectTransactionsTotal(ctx context.Context) (int64, error)
+	SelectTransactions(ctx context.Context, arg SelectTransactionsParams) ([]SelectTransactionsRow, error)
+	SelectTransactionsTotal(ctx context.Context, arg SelectTransactionsTotalParams) (int64, error)
 }
 
 var _ Querier = (*Queries)(nil)

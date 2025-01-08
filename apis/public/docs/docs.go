@@ -58,6 +58,34 @@ const docTemplate = `{
                 "tags": [
                     "Checkout Orders"
                 ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "limit min 1",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "offset min 0",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "filter_min_date",
+                        "name": "filter_min_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "filter_max_date",
+                        "name": "filter_max_date",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -72,12 +100,45 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/response.GetOrders"
+                                                "$ref": "#/definitions/response.GetTransactions"
                                             }
                                         }
                                     }
                                 }
                             ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Exception"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/checkout/transactions/{transactionID}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Checkout Orders"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "transactionID",
+                        "name": "transactionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.GetTransactionsByID"
                         }
                     },
                     "400": {
@@ -109,7 +170,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         },
@@ -124,7 +185,7 @@ const docTemplate = `{
                 }
             }
         },
-        "response.GetOrders": {
+        "response.GetTransactions": {
             "type": "object",
             "properties": {
                 "description": {
@@ -132,6 +193,20 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "transaction_date": {
+                    "type": "string"
+                },
+                "transaction_value": {
+                    "type": "number"
+                }
+            }
+        },
+        "response.GetTransactionsByID": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
                 },
                 "transaction_date": {
                     "type": "string"

@@ -20,8 +20,14 @@ struct for posts
 struct for gets
 ******/
 
-type GetOrders struct {
+type GetTransactions struct {
 	ID               int64     `json:"id"`
+	Description      string    `json:"description"`
+	TransactionDate  time.Time `json:"transaction_date"`
+	TransactionValue float64   `json:"transaction_value"`
+}
+
+type GetTransactionsByID struct {
 	Description      string    `json:"description"`
 	TransactionDate  time.Time `json:"transaction_date"`
 	TransactionValue float64   `json:"transaction_value"`

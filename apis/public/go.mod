@@ -9,6 +9,7 @@ replace github.com/luancpereira/APICheckout/apis/commons => ../commons
 require (
 	github.com/gin-contrib/cors v1.7.1
 	github.com/gin-gonic/gin v1.10.0
+	github.com/jinzhu/copier v0.4.0
 	github.com/luancpereira/APICheckout/core v0.0.1
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0

@@ -27,6 +27,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.insertTransactionStmt, err = db.PrepareContext(ctx, insertTransaction); err != nil {
 		return nil, fmt.Errorf("error preparing query InsertTransaction: %w", err)
 	}
+	if q.selectTransactionByIDStmt, err = db.PrepareContext(ctx, selectTransactionByID); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectTransactionByID: %w", err)
+	}
 	if q.selectTransactionsStmt, err = db.PrepareContext(ctx, selectTransactions); err != nil {
 		return nil, fmt.Errorf("error preparing query SelectTransactions: %w", err)
 	}
@@ -41,6 +44,11 @@ func (q *Queries) Close() error {
 	if q.insertTransactionStmt != nil {
 		if cerr := q.insertTransactionStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing insertTransactionStmt: %w", cerr)
+		}
+	}
+	if q.selectTransactionByIDStmt != nil {
+		if cerr := q.selectTransactionByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectTransactionByIDStmt: %w", cerr)
 		}
 	}
 	if q.selectTransactionsStmt != nil {
@@ -93,6 +101,7 @@ type Queries struct {
 	db                          DBTX
 	tx                          *sql.Tx
 	insertTransactionStmt       *sql.Stmt
+	selectTransactionByIDStmt   *sql.Stmt
 	selectTransactionsStmt      *sql.Stmt
 	selectTransactionsTotalStmt *sql.Stmt
 }
@@ -102,6 +111,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		db:                          tx,
 		tx:                          tx,
 		insertTransactionStmt:       q.insertTransactionStmt,
+		selectTransactionByIDStmt:   q.selectTransactionByIDStmt,
 		selectTransactionsStmt:      q.selectTransactionsStmt,
 		selectTransactionsTotalStmt: q.selectTransactionsTotalStmt,
 	}

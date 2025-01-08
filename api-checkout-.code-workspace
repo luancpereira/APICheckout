@@ -8,10 +8,6 @@
       "name": "api_public"
     },
     {
-      "path": "apis/commons",
-      "name": "api_commons"
-    },
-    {
       "path": "dev"
     },
     {
