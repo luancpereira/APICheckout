@@ -70,7 +70,6 @@ func (Checkout) GetByID(transactionID int64, country string) (transaction Transa
 
 	exchangeRate, err := getExchangeRate(transactionDetail.TransactionDate, country)
 	if err != nil {
-		err = coreError.New("error.get.exchange.rate")
 		return
 	}
 
@@ -100,7 +99,6 @@ func (Checkout) GetList(filters map[string]string, limit, offset int64, country 
 	exchangeRate, err := getExchangeRate(parsedDate, country)
 
 	if err != nil {
-		err = coreError.New("error.get.exchange.rate")
 		return
 	}
 

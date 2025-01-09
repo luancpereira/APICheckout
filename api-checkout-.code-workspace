@@ -4,8 +4,8 @@
       "path": "core"
     },
     {
-      "path": "apis/public",
-      "name": "api_public"
+      "path": "apis/checkout",
+      "name": "api_checkout"
     },
     {
       "path": "dev"
