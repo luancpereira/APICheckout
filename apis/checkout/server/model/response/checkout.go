@@ -25,6 +25,7 @@ type GetTransactions struct {
 	Description                             string    `json:"description"`
 	TransactionDate                         time.Time `json:"transaction_date"`
 	TransactionValue                        float64   `json:"transaction_value"`
+	ExchangeRate                            float64   `json:"exchange_rate"`
 	TransactionValueConvertedToWishCurrency float64   `json:"transaction_value_converted_to_wish_currency"`
 }
 
@@ -33,6 +34,7 @@ type GetTransactionsByID struct {
 	Description                             string    `json:"description"`
 	TransactionDate                         time.Time `json:"transaction_date"`
 	TransactionValue                        float64   `json:"transaction_value"`
+	ExchangeRate                            float64   `json:"exchange_rate"`
 	TransactionValueConvertedToWishCurrency float64   `json:"transaction_value_converted_to_wish_currency"`
 }
 

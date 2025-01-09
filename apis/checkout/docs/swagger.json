@@ -192,6 +192,9 @@
                 "description": {
                     "type": "string"
                 },
+                "exchange_rate": {
+                    "type": "number"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -211,6 +214,9 @@
             "properties": {
                 "description": {
                     "type": "string"
+                },
+                "exchange_rate": {
+                    "type": "number"
                 },
                 "id": {
                     "type": "integer"

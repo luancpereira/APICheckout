@@ -125,6 +125,7 @@ func (Checkout) GetList(ctx *gin.Context) {
 			Description:                             model.Description,
 			TransactionDate:                         model.TransactionDate,
 			TransactionValue:                        model.TransactionValue,
+			ExchangeRate:                            model.ExchangeRate,
 			TransactionValueConvertedToWishCurrency: model.TransactionValueConvertedToWishCurrency,
 		})
 	}

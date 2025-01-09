@@ -200,6 +200,9 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
+                "exchange_rate": {
+                    "type": "number"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -219,6 +222,9 @@ const docTemplate = `{
             "properties": {
                 "description": {
                     "type": "string"
+                },
+                "exchange_rate": {
+                    "type": "number"
                 },
                 "id": {
                     "type": "integer"

@@ -24,6 +24,8 @@ definitions:
     properties:
       description:
         type: string
+      exchange_rate:
+        type: number
       id:
         type: integer
       transaction_date:
@@ -37,6 +39,8 @@ definitions:
     properties:
       description:
         type: string
+      exchange_rate:
+        type: number
       id:
         type: integer
       transaction_date:

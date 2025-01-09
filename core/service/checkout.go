@@ -75,6 +75,7 @@ func (Checkout) GetByID(transactionID int64, country string) (transaction Transa
 
 	transaction = TransactionDetail{
 		SelectTransactionByIDRow:                transactionDetail,
+		ExchangeRate:                            exchangeRate,
 		TransactionValueConvertedToWishCurrency: math.Round(transactionDetail.TransactionValue*exchangeRate*100) / 100,
 	}
 
@@ -108,6 +109,7 @@ func (Checkout) GetList(filters map[string]string, limit, offset int64, country 
 
 		transactionDetail := TransactionDetailList{
 			SelectTransactionsRow:                   transaction,
+			ExchangeRate:                            exchangeRate,
 			TransactionValueConvertedToWishCurrency: math.Round(transaction.TransactionValue*exchangeRate*100) / 100,
 		}
 
@@ -218,11 +220,13 @@ other funcs
 
 type TransactionDetail struct {
 	sqlc.SelectTransactionByIDRow
+	ExchangeRate                            float64
 	TransactionValueConvertedToWishCurrency float64
 }
 
 type TransactionDetailList struct {
 	sqlc.SelectTransactionsRow
+	ExchangeRate                            float64
 	TransactionValueConvertedToWishCurrency float64
 }
 
