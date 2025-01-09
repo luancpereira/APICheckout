@@ -24,12 +24,12 @@ funcs for creations
 
 func (c Checkout) CreateTransaction(description string, transaction_date time.Time, transaction_value float64) (ID int64, err error) {
 
-	err = c.validateDescription(description)
+	err = c.ValidateDescription(description)
 	if err != nil {
 		return
 	}
 
-	err = c.validateTrasactionValue(transaction_value)
+	err = c.ValidateTrasactionValue(transaction_value)
 	if err != nil {
 		return
 	}
@@ -158,7 +158,7 @@ funcs for gets
 funcs for validations
 ******/
 
-func (Checkout) validateDescription(description string) (err error) {
+func (Checkout) ValidateDescription(description string) (err error) {
 	if len(description) == 0 {
 		err = coreError.New("error.description.empty")
 		return
@@ -172,7 +172,7 @@ func (Checkout) validateDescription(description string) (err error) {
 	return
 }
 
-func (Checkout) validateTrasactionValue(value float64) (err error) {
+func (Checkout) ValidateTrasactionValue(value float64) (err error) {
 	if value <= 0 {
 		err = coreError.New("error.value.not.positive")
 		return
