@@ -37,7 +37,7 @@ func New(keys ...string) *CoreError {
 	cacheMsg = C.Get(msgKey)
 
 	if cacheMsg == nil {
-		log.Errorf(ConcatenateStrings("error not in errors.json please contact the dev team:", msgKey))
+		log.Errorf("%s", ConcatenateStrings("error not in errors.json please contact the dev team:", msgKey))
 		return &CoreError{Key: msgKey}
 	}
 
