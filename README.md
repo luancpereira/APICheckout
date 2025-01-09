@@ -27,7 +27,7 @@ Para realizar uma conexão através do client de preferencia, basta utilizar as 
 
 #### Swagger 
 
-Para executar o swagger/api pelo VS Code, é necessário executar no "Run and Debug" da ferramenta.
+Para executar o swagger/api localmente, no VS Code é necessário executar no "Run and Debug" da ferramenta.
 
 Os swaggers estão nas seguintes URLS: 
 
