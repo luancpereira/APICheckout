@@ -29,6 +29,6 @@ Para realizar uma conexão através do client de preferencia, basta utilizar as 
 
 Para executar o swagger/api localmente, no VS Code é necessário executar no "Run and Debug" da ferramenta.
 
-Os swaggers estão nas seguintes URLS: 
+O swagger em LocalHost esta na seguinte URL: 
 
 ➡️ [API Checkout](http://localhost:9000/docs/swagger/index.html#/)
