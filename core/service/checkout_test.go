@@ -158,22 +158,22 @@ func TestFindRegistryWithDateCloset(t *testing.T) {
 	records := []service.Record{
 		{
 			EffectiveDate: "2025-01-01",
-			Country:       "USA",
+			Country:       "BRAZIL",
 			ExchangeRate:  "1.25",
 		},
 		{
 			EffectiveDate: "2025-01-05",
-			Country:       "USA",
+			Country:       "BRAZIL",
 			ExchangeRate:  "1.30",
 		},
 		{
 			EffectiveDate: "2025-01-10",
-			Country:       "USA",
+			Country:       "BRAZIL",
 			ExchangeRate:  "1.35",
 		},
 		{
 			EffectiveDate: "2024-07-01",
-			Country:       "USA",
+			Country:       "BRAZIL",
 			ExchangeRate:  "1.50",
 		},
 	}
@@ -206,7 +206,7 @@ func TestFindRegistryWithDateCloset(t *testing.T) {
 	t.Run("Deve retornar erro para datas de registro inválidas", func(t *testing.T) {
 		invalidRecords := append(records, service.Record{
 			EffectiveDate: "invalid-date",
-			Country:       "USA",
+			Country:       "BRAZIL",
 			ExchangeRate:  "1.60",
 		})
 
