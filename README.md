@@ -1,2 +1,34 @@
 # API Checkout
 
+#### Importanto o Projeto
+
+Para evitar problemas no projeto dentro do VS Code, segue este padrão de importação.
+
+Para isso é necessário abrir o arquivo `api-checkout.code-workspace`
+
+#### Start
+Para iniciar todos os serviços dependente do projeto, execute o seguinte comando dentro do diretorio principal do projeto:
+
+```sh
+docker-compose -f dev/docker/docker-compose.yaml up --build
+```
+
+---
+
+#### Banco de Dados
+Para realizar uma conexão através do client de preferencia, basta utilizar as credenciais abaixo:
+
+- **host**: 0.0.0.0
+- **user**: apicheckout
+- **password**: apicheckout
+- **database**: apicheckout
+
+---  
+
+#### Swagger 
+
+Para executar o swagger/api pelo VS Code, é necessário executar no "Run and Debug" da ferramenta.
+
+Os swaggers estão nas seguintes URLS: 
+
+➡️ [API Checkout](http://localhost:9000/docs/swagger/index.html#/)
