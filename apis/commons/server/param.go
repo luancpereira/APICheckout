@@ -42,21 +42,6 @@ func (Param) GetPathParamString(ctx *gin.Context, key string, required bool) (va
 	return
 }
 
-// func (s Param) GetPathParamUUID(ctx *gin.Context, key string, required bool) (value uuid.UUID, err error) {
-// 	param, err := s.GetPathParamString(ctx, key, required)
-// 	if err != nil {
-// 		return
-// 	}
-
-// 	value, err = utils.Util{}.StringToUUID(param)
-// 	if err != nil {
-// 		err = coreError.New("error.request.path.param.invalid", key, err.Error())
-// 		Response{}.ResponseBadRequest(ctx, err)
-// 	}
-
-// 	return
-// }
-
 func (s Param) GetPathParamInt64(ctx *gin.Context, key string, required bool) (value int64, err error) {
 	param, err := s.GetPathParamString(ctx, key, required)
 	if err != nil {

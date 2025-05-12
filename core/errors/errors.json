@@ -9,5 +9,21 @@
   "error.loading.file.error": "Error loading file",
   "error.get.exchange.rate": "Error getting exchange rate",
   "error.transaction.date.required": "Transaction date is required",
-  "error.request.path.param.invalid": "Invalid request path parameter"
+  "error.request.path.param.invalid": "Invalid request path parameter",
+  "error.database.transaction.begin": "Error beginning database transaction",
+  "error.database.transaction.execute": "Error executing database transaction",
+  "error.database.transaction.commit": "Error committing database transaction",
+  "error.user.already.exists": "User already exists",
+  "error.validation.email.invalid": "Invalid email address",
+  "error.public.user.email.exists": "User with this email already exists",
+  "error.public.user.password.mismatch": "Passwords do not match",
+  "error.public.user.password.size": "Password must be at least 8 characters long",
+  "error.public.user.password.uppers": "Password must contain at least one uppercase letter",
+  "error.public.user.password.special.characters": "Password must contain at least one special character",
+  "error.crypt.hash.value": "Error hashing value",
+  "error.crypt.compare.values": "Error comparing values",
+  "error.auth.header.invalid": "Invalid authorization header",
+  "error.auth.login.unauthorized": "Unauthorized",
+  "error.login.unauthorized": "Unauthorized",
+  "error.login.create.token": "Error creating token"
 }
