@@ -119,16 +119,16 @@ funcs for validations
 ******/
 
 func (u User) validateToCreate(model sqlc.InsertUserParams, repeatPassword string) (errorFields []coreError.CoreErrorField) {
-	err := u.validateEmail(model.Email, 0)
+	err := u.ValidateEmail(model.Email, 0)
 	coreError.MakeErrorField(err, enums.USER_VALIDATION_FIELD_EMAIL, &errorFields)
 
-	err = u.validatePassword(model.Password, repeatPassword)
+	err = u.ValidatePassword(model.Password, repeatPassword)
 	coreError.MakeErrorField(err, enums.USER_VALIDATION_FIELD_PASSWORD, &errorFields)
 
 	return
 }
 
-func (u User) validateEmail(email string, ID int64) (err error) {
+func (u User) ValidateEmail(email string, ID int64) (err error) {
 	if !commonsUtils.ValidateEmail(email) {
 		return coreError.New("error.validation.email.invalid")
 	}
@@ -145,7 +145,7 @@ func (u User) validateEmail(email string, ID int64) (err error) {
 	return nil
 }
 
-func (u User) validatePassword(password, repeatPassword string) (err error) {
+func (u User) ValidatePassword(password, repeatPassword string) (err error) {
 	if password != repeatPassword {
 		return coreError.New("error.public.user.password.mismatch")
 	}
