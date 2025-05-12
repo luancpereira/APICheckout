@@ -8,6 +8,24 @@ definitions:
       transaction_value:
         type: number
     type: object
+  request.PostAuthLogin:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  request.PostUser:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      repeat_password:
+        type: string
+    type: object
   response.Created:
     properties:
       id:
@@ -61,12 +79,62 @@ definitions:
       total:
         type: integer
     type: object
+  response.PostAuthLogin:
+    properties:
+      token:
+        type: string
+    type: object
+  response.PostUser:
+    properties:
+      token:
+        type: string
+    type: object
+  response.PostUserException:
+    properties:
+      field:
+        enum:
+        - COUNTRY
+        - EMAIL
+        - PASSWORD
+        - FORM
+        type: string
+      key:
+        type: string
+      message:
+        type: string
+    type: object
 info:
   contact: {}
-  description: api checkout
+  description: API checkout
   title: API Checkout
   version: "1.0"
 paths:
+  /api/auth/login:
+    post:
+      parameters:
+      - description: Body JSON
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.PostAuthLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.PostAuthLogin'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Exception'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Exception'
+      tags:
+      - Auth
   /api/checkout:
     post:
       parameters:
@@ -87,6 +155,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/response.Exception'
+      security:
+      - JWT: []
       tags:
       - Checkout Orders
   /api/checkout/transactions/{transactionID}/country/{country}:
@@ -113,6 +183,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/response.Exception'
+      security:
+      - JWT: []
       tags:
       - Checkout Orders
   /api/checkout/transactions/country/{country}:
@@ -156,6 +228,37 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/response.Exception'
+      security:
+      - JWT: []
       tags:
       - Checkout Orders
+  /api/users:
+    post:
+      parameters:
+      - description: Body JSON
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/request.PostUser'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/response.PostUser'
+        "400":
+          description: Bad Request
+          schema:
+            items:
+              $ref: '#/definitions/response.PostUserException'
+            type: array
+      tags:
+      - User
+securityDefinitions:
+  JWT:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

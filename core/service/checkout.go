@@ -9,11 +9,11 @@ import (
 	"strconv"
 	"time"
 
+	commonsUtils "github.com/luancpereira/APICheckout/apis/commons/utils"
 	"github.com/luancpereira/APICheckout/core/database"
 	"github.com/luancpereira/APICheckout/core/database/sqlc"
 	coreError "github.com/luancpereira/APICheckout/core/errors"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
+	"github.com/luancpereira/APICheckout/core/models"
 )
 
 type Checkout struct{}
@@ -61,7 +61,7 @@ funcs for creations
 funcs for gets
 ******/
 
-func (Checkout) GetByID(transactionID int64, country string) (transaction TransactionDetail, err error) {
+func (Checkout) GetByID(transactionID int64, country string) (transaction models.TransactionDetail, err error) {
 	transactionDetail, err := database.DB_QUERIER.SelectTransactionByID(context.Background(), transactionID)
 	if err != nil {
 		err = database.Utils{}.CoreErrorDatabase(err)
@@ -73,7 +73,7 @@ func (Checkout) GetByID(transactionID int64, country string) (transaction Transa
 		return
 	}
 
-	transaction = TransactionDetail{
+	transaction = models.TransactionDetail{
 		SelectTransactionByIDRow:                transactionDetail,
 		ExchangeRate:                            math.Round(exchangeRate*100) / 100,
 		TransactionValueConvertedToWishCurrency: math.Round(transactionDetail.TransactionValue*exchangeRate*100) / 100,
@@ -82,7 +82,7 @@ func (Checkout) GetByID(transactionID int64, country string) (transaction Transa
 	return
 }
 
-func (Checkout) GetList(filters map[string]string, limit, offset int64, country string) (models []TransactionDetailList, total int64, err error) {
+func (Checkout) GetList(filters map[string]string, limit, offset int64, country string) (result []models.TransactionDetailList, total int64, err error) {
 	params := sqlc.SelectTransactionsParams{
 		Column1:         limit,
 		Column2:         offset,
@@ -103,11 +103,11 @@ func (Checkout) GetList(filters map[string]string, limit, offset int64, country 
 		return
 	}
 
-	var transactionDetailList []TransactionDetailList
+	var transactionDetailList []models.TransactionDetailList
 
 	for _, transaction := range transactions {
 
-		transactionDetail := TransactionDetailList{
+		transactionDetail := models.TransactionDetailList{
 			SelectTransactionsRow:                   transaction,
 			ExchangeRate:                            math.Round(exchangeRate*100) / 100,
 			TransactionValueConvertedToWishCurrency: math.Round(transaction.TransactionValue*exchangeRate*100) / 100,
@@ -116,7 +116,7 @@ func (Checkout) GetList(filters map[string]string, limit, offset int64, country 
 		transactionDetailList = append(transactionDetailList, transactionDetail)
 	}
 
-	models = transactionDetailList
+	result = transactionDetailList
 
 	total, err = database.DB_QUERIER.SelectTransactionsTotal(context.Background(), filters["transaction_date"])
 	if err != nil {
@@ -129,9 +129,9 @@ func (Checkout) GetList(filters map[string]string, limit, offset int64, country 
 
 func getExchangeRate(transactionDate time.Time, country string) (float64, error) {
 	formattedDate := transactionDate.Format("2006-01-02")
-	url := "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange?filter=country:eq:" + CapitalizeFirstLetter(country) + ",effective_date:lte:" + formattedDate
+	url := "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange?filter=country:eq:" + commonsUtils.CapitalizeFirstLetter(country) + ",effective_date:lte:" + formattedDate
 
-	var response Response
+	var response models.Response
 	err := GetEntity(url, map[string]string{}, &response)
 	if err != nil {
 		return 0, err
@@ -181,7 +181,7 @@ func (Checkout) ValidateTrasactionValue(value float64) (err error) {
 	return
 }
 
-func FindRegistryWithDateCloset(records []Record, targetDate time.Time) (closestRecord Record, err error) {
+func FindRegistryWithDateCloset(records []models.Record, targetDate time.Time) (closestRecord models.Record, err error) {
 	var minDiff time.Duration = time.Duration(math.MaxInt64)
 
 	const maxDuration = 182 * 24 * time.Hour
@@ -218,43 +218,6 @@ funcs for validations
 other funcs
 ******/
 
-type TransactionDetail struct {
-	sqlc.SelectTransactionByIDRow
-	ExchangeRate                            float64
-	TransactionValueConvertedToWishCurrency float64
-}
-
-type TransactionDetailList struct {
-	sqlc.SelectTransactionsRow
-	ExchangeRate                            float64
-	TransactionValueConvertedToWishCurrency float64
-}
-
-type Record struct {
-	RecordDate            string `json:"record_date"`
-	Country               string `json:"country"`
-	Currency              string `json:"currency"`
-	CountryCurrencyDesc   string `json:"country_currency_desc"`
-	ExchangeRate          string `json:"exchange_rate"`
-	EffectiveDate         string `json:"effective_date"`
-	SrcLineNbr            string `json:"src_line_nbr"`
-	RecordFiscalYear      string `json:"record_fiscal_year"`
-	RecordFiscalQuarter   string `json:"record_fiscal_quarter"`
-	RecordCalendarYear    string `json:"record_calendar_year"`
-	RecordCalendarQuarter string `json:"record_calendar_quarter"`
-	RecordCalendarMonth   string `json:"record_calendar_month"`
-	RecordCalendarDay     string `json:"record_calendar_day"`
-}
-
-type Meta struct {
-	Count int `json:"count"`
-}
-
-type Response struct {
-	Data []Record `json:"data"`
-	Meta Meta     `json:"meta"`
-}
-
 func GetEntity(url string, headers map[string]string, target interface{}) error {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -281,10 +244,6 @@ func GetEntity(url string, headers map[string]string, target interface{}) error 
 	}
 
 	return nil
-}
-
-func CapitalizeFirstLetter(text string) string {
-	return cases.Title(language.Und, cases.Compact).String(text)
 }
 
 /*****

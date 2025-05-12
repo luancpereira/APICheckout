@@ -13,6 +13,10 @@ type Querier interface {
 	//-- INSERTS ----
 	//---------------
 	InsertTransaction(ctx context.Context, arg InsertTransactionParams) (int64, error)
+	//---------------
+	//-- INSERTS ----
+	//---------------
+	InsertUser(ctx context.Context, arg InsertUserParams) (InsertUserRow, error)
 	SelectTransactionByID(ctx context.Context, id int64) (SelectTransactionByIDRow, error)
 	//---------------
 	//-- INSERTS ----
@@ -22,6 +26,14 @@ type Querier interface {
 	//---------------
 	SelectTransactions(ctx context.Context, arg SelectTransactionsParams) ([]SelectTransactionsRow, error)
 	SelectTransactionsTotal(ctx context.Context, transactionDate string) (int64, error)
+	//---------------
+	//-- INSERTS ----
+	//---------------
+	//---------------
+	//-- SELECTS ----
+	//---------------
+	SelectUserForLogin(ctx context.Context, email string) (SelectUserForLoginRow, error)
+	SelectUserIDByEmail(ctx context.Context, email string) (int64, error)
 }
 
 var _ Querier = (*Queries)(nil)

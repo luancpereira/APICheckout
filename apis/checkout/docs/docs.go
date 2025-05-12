@@ -15,8 +15,54 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/auth/login": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "parameters": [
+                    {
+                        "description": "Body JSON",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.PostAuthLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.PostAuthLogin"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Exception"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.Exception"
+                        }
+                    }
+                }
+            }
+        },
         "/api/checkout": {
             "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -52,6 +98,11 @@ const docTemplate = `{
         },
         "/api/checkout/transactions/country/{country}": {
             "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -121,6 +172,11 @@ const docTemplate = `{
         },
         "/api/checkout/transactions/{transactionID}/country/{country}": {
             "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -158,6 +214,44 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/users": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "description": "Body JSON",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.PostUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/response.PostUser"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.PostUserException"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -172,6 +266,34 @@ const docTemplate = `{
                 },
                 "transaction_value": {
                     "type": "number"
+                }
+            }
+        },
+        "request.PostAuthLogin": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.PostUser": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "repeat_password": {
+                    "type": "string"
                 }
             }
         },
@@ -256,6 +378,49 @@ const docTemplate = `{
                     "type": "integer"
                 }
             }
+        },
+        "response.PostAuthLogin": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.PostUser": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.PostUserException": {
+            "type": "object",
+            "properties": {
+                "field": {
+                    "type": "string",
+                    "enum": [
+                        "COUNTRY",
+                        "EMAIL",
+                        "PASSWORD",
+                        "FORM"
+                    ]
+                },
+                "key": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "JWT": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`
@@ -267,7 +432,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "API Checkout",
-	Description:      "api checkout",
+	Description:      "API checkout",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

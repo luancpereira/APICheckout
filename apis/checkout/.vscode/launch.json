@@ -16,8 +16,12 @@
         "DATABASE_PORT": "5438",
         "ERROR_FILE": "../../core/errors/errors.json",
         
+        // API Envs
         "SERVER_PORT": "9000",
+        "JWT_SECRET": "api-checkout-20250501",
+        "EXPIRATION_TOKEN_DEFAULT": "86400s",
         "SWAGGER_SERVER_HOST": "localhost:9000"
+        // API Envs
       }
     }
   ]

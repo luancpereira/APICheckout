@@ -27,6 +27,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.insertTransactionStmt, err = db.PrepareContext(ctx, insertTransaction); err != nil {
 		return nil, fmt.Errorf("error preparing query InsertTransaction: %w", err)
 	}
+	if q.insertUserStmt, err = db.PrepareContext(ctx, insertUser); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertUser: %w", err)
+	}
 	if q.selectTransactionByIDStmt, err = db.PrepareContext(ctx, selectTransactionByID); err != nil {
 		return nil, fmt.Errorf("error preparing query SelectTransactionByID: %w", err)
 	}
@@ -36,6 +39,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.selectTransactionsTotalStmt, err = db.PrepareContext(ctx, selectTransactionsTotal); err != nil {
 		return nil, fmt.Errorf("error preparing query SelectTransactionsTotal: %w", err)
 	}
+	if q.selectUserForLoginStmt, err = db.PrepareContext(ctx, selectUserForLogin); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectUserForLogin: %w", err)
+	}
+	if q.selectUserIDByEmailStmt, err = db.PrepareContext(ctx, selectUserIDByEmail); err != nil {
+		return nil, fmt.Errorf("error preparing query SelectUserIDByEmail: %w", err)
+	}
 	return &q, nil
 }
 
@@ -44,6 +53,11 @@ func (q *Queries) Close() error {
 	if q.insertTransactionStmt != nil {
 		if cerr := q.insertTransactionStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing insertTransactionStmt: %w", cerr)
+		}
+	}
+	if q.insertUserStmt != nil {
+		if cerr := q.insertUserStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertUserStmt: %w", cerr)
 		}
 	}
 	if q.selectTransactionByIDStmt != nil {
@@ -59,6 +73,16 @@ func (q *Queries) Close() error {
 	if q.selectTransactionsTotalStmt != nil {
 		if cerr := q.selectTransactionsTotalStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing selectTransactionsTotalStmt: %w", cerr)
+		}
+	}
+	if q.selectUserForLoginStmt != nil {
+		if cerr := q.selectUserForLoginStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectUserForLoginStmt: %w", cerr)
+		}
+	}
+	if q.selectUserIDByEmailStmt != nil {
+		if cerr := q.selectUserIDByEmailStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing selectUserIDByEmailStmt: %w", cerr)
 		}
 	}
 	return err
@@ -101,9 +125,12 @@ type Queries struct {
 	db                          DBTX
 	tx                          *sql.Tx
 	insertTransactionStmt       *sql.Stmt
+	insertUserStmt              *sql.Stmt
 	selectTransactionByIDStmt   *sql.Stmt
 	selectTransactionsStmt      *sql.Stmt
 	selectTransactionsTotalStmt *sql.Stmt
+	selectUserForLoginStmt      *sql.Stmt
+	selectUserIDByEmailStmt     *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
@@ -111,8 +138,11 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		db:                          tx,
 		tx:                          tx,
 		insertTransactionStmt:       q.insertTransactionStmt,
+		insertUserStmt:              q.insertUserStmt,
 		selectTransactionByIDStmt:   q.selectTransactionByIDStmt,
 		selectTransactionsStmt:      q.selectTransactionsStmt,
 		selectTransactionsTotalStmt: q.selectTransactionsTotalStmt,
+		selectUserForLoginStmt:      q.selectUserForLoginStmt,
+		selectUserIDByEmailStmt:     q.selectUserIDByEmailStmt,
 	}
 }

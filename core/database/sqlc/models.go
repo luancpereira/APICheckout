@@ -5,6 +5,7 @@
 package sqlc
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -13,4 +14,15 @@ type Order struct {
 	Description      string
 	TransactionDate  time.Time
 	TransactionValue float64
+}
+
+type User struct {
+	ID                              int64
+	Email                           string
+	Name                            sql.NullString
+	Password                        sql.NullString
+	Permission                      sql.NullString
+	CreatedAt                       time.Time
+	TokenConfirmation               sql.NullString
+	TokenConfirmationExpirationDate sql.NullTime
 }

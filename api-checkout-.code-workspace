@@ -7,6 +7,10 @@
       "path": "apis/checkout",
       "name": "api_checkout"
     },
+        {
+      "path": "apis/commons",
+      "name": "api_commons"
+    },
     {
       "path": "dev"
     },

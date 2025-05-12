@@ -9,6 +9,7 @@ import (
 
 	"github.com/jellydator/ttlcache/v3"
 	coreErrors "github.com/luancpereira/APICheckout/core/errors"
+	"github.com/luancpereira/APICheckout/core/models"
 	"github.com/luancpereira/APICheckout/core/service"
 	"github.com/stretchr/testify/assert"
 )
@@ -155,7 +156,7 @@ func TestGetEntity(t *testing.T) {
 }
 
 func TestFindRegistryWithDateCloset(t *testing.T) {
-	records := []service.Record{
+	records := []models.Record{
 		{
 			EffectiveDate: "2025-01-01",
 			Country:       "BRAZIL",
@@ -200,11 +201,11 @@ func TestFindRegistryWithDateCloset(t *testing.T) {
 
 		assert.Equal(t, "error.not.found.value.record", coreErr.Key)
 
-		assert.Equal(t, service.Record{}, closestRecord)
+		assert.Equal(t, models.Record{}, closestRecord)
 	})
 
 	t.Run("Deve retornar erro para datas de registro inválidas", func(t *testing.T) {
-		invalidRecords := append(records, service.Record{
+		invalidRecords := append(records, models.Record{
 			EffectiveDate: "invalid-date",
 			Country:       "BRAZIL",
 			ExchangeRate:  "1.60",

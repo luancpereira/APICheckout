@@ -1,9 +1,8 @@
 package errors
 
 import (
-	"strings"
-
 	"github.com/jellydator/ttlcache/v3"
+	commonsUtils "github.com/luancpereira/APICheckout/apis/commons/utils"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -31,18 +30,18 @@ func New(keys ...string) *CoreError {
 
 	if len(keys) > 1 {
 		for i := 1; i < len(keys); i++ {
-			message = ConcatenateStrings(message, keys[i])
+			message = commonsUtils.ConcatenateStrings(message, keys[i])
 		}
 	}
 	cacheMsg = C.Get(msgKey)
 
 	if cacheMsg == nil {
-		log.Errorf("%s", ConcatenateStrings("error not in errors.json please contact the dev team:", msgKey))
+		log.Errorf("%s", commonsUtils.ConcatenateStrings("error not in errors.json please contact the dev team:", msgKey))
 		return &CoreError{Key: msgKey}
 	}
 
-	if StringIsNotEmpty(message) {
-		fullMessageError := ConcatenateStrings(cacheMsg.Value(), " ", message)
+	if commonsUtils.StringIsNotEmpty(message) {
+		fullMessageError := commonsUtils.ConcatenateStrings(cacheMsg.Value(), " ", message)
 		return &CoreError{Key: cacheMsg.Key(), Message: fullMessageError}
 
 	}
@@ -60,19 +59,24 @@ func ConvertTo(err interface{}) *CoreError {
 }
 
 func (e *CoreError) Error() string {
-	return ConcatenateStrings(e.Key, " | ", e.Message)
+	return commonsUtils.ConcatenateStrings(e.Key, " | ", e.Message)
 }
 
-func ConcatenateStrings(values ...string) string {
-	var sb strings.Builder
-
-	for _, str := range values {
-		sb.WriteString(str)
+func MakeErrorField(err error, field string, errorFields *[]CoreErrorField) (hasError bool) {
+	if err == nil {
+		return
 	}
 
-	return sb.String()
-}
+	errOut := ConvertTo(err)
+	if errOut == nil {
+		return
+	}
 
-func StringIsNotEmpty(value string) bool {
-	return len(strings.TrimSpace(value)) > 0
+	*errorFields = append(*errorFields, CoreErrorField{
+		Field:   field,
+		Key:     errOut.Key,
+		Message: errOut.Message,
+	})
+
+	return len(*errorFields) > 0
 }
