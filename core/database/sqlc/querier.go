@@ -12,6 +12,13 @@ type Querier interface {
 	//---------------
 	//-- INSERTS ----
 	//---------------
+	//---------------
+	//-- DELETES ----
+	//---------------
+	DeleteTransactionByID(ctx context.Context, id int32) error
+	//---------------
+	//-- INSERTS ----
+	//---------------
 	InsertTransaction(ctx context.Context, arg InsertTransactionParams) (int64, error)
 	//---------------
 	//-- INSERTS ----
@@ -19,7 +26,7 @@ type Querier interface {
 	InsertUser(ctx context.Context, arg InsertUserParams) (InsertUserRow, error)
 	SelectTransactionByID(ctx context.Context, id int64) (SelectTransactionByIDRow, error)
 	//---------------
-	//-- INSERTS ----
+	//-- DELETES ----
 	//---------------
 	//---------------
 	//-- SELECTS ----

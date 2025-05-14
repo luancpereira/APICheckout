@@ -24,6 +24,9 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
+	if q.deleteTransactionByIDStmt, err = db.PrepareContext(ctx, deleteTransactionByID); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteTransactionByID: %w", err)
+	}
 	if q.insertTransactionStmt, err = db.PrepareContext(ctx, insertTransaction); err != nil {
 		return nil, fmt.Errorf("error preparing query InsertTransaction: %w", err)
 	}
@@ -50,6 +53,11 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 
 func (q *Queries) Close() error {
 	var err error
+	if q.deleteTransactionByIDStmt != nil {
+		if cerr := q.deleteTransactionByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteTransactionByIDStmt: %w", cerr)
+		}
+	}
 	if q.insertTransactionStmt != nil {
 		if cerr := q.insertTransactionStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing insertTransactionStmt: %w", cerr)
@@ -124,6 +132,7 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 type Queries struct {
 	db                          DBTX
 	tx                          *sql.Tx
+	deleteTransactionByIDStmt   *sql.Stmt
 	insertTransactionStmt       *sql.Stmt
 	insertUserStmt              *sql.Stmt
 	selectTransactionByIDStmt   *sql.Stmt
@@ -137,6 +146,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
 		db:                          tx,
 		tx:                          tx,
+		deleteTransactionByIDStmt:   q.deleteTransactionByIDStmt,
 		insertTransactionStmt:       q.insertTransactionStmt,
 		insertUserStmt:              q.insertUserStmt,
 		selectTransactionByIDStmt:   q.selectTransactionByIDStmt,

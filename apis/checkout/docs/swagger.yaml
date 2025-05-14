@@ -159,6 +159,27 @@ paths:
       - JWT: []
       tags:
       - Checkout Orders
+  /api/checkout/transactions/{transactionID}:
+    delete:
+      parameters:
+      - description: transactionID
+        in: path
+        name: transactionID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Exception'
+      security:
+      - JWT: []
+      tags:
+      - Checkout Orders
   /api/checkout/transactions/{transactionID}/country/{country}:
     get:
       parameters:

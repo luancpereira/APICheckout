@@ -41,6 +41,30 @@ func (Checkout) InsertTransaction(ctx *gin.Context) {
 	commonsServer.Response{}.ResponseCreated(ctx, ID)
 }
 
+// godoc
+//
+//	@Tags		Checkout Orders
+//	@Produce	json
+//	@Security	JWT
+//	@Param		transactionID	path	int64	true	"transactionID"
+//	@Success	204
+//	@Failure	400	{object}	response.Exception
+//	@Router		/api/checkout/transactions/{transactionID} [delete]
+func (Checkout) DeleteTransaction(ctx *gin.Context) {
+	transactionID, err := commonsServer.Param{}.GetPathParamInt64(ctx, "transactionID", true)
+	if err != nil {
+		return
+	}
+
+	err = service.Checkout{}.DeleteTransactionByID(int32(transactionID))
+	if err != nil {
+		commonsServer.Response{}.ResponseBadRequest(ctx, err)
+		return
+	}
+
+	commonsServer.Response{}.ResponseNoContent(ctx)
+}
+
 /*****
 funcs for posts
 ******/

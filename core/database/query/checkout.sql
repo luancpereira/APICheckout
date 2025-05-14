@@ -18,6 +18,18 @@ INSERT INTO "order" (
 -----------------
 
 -----------------
+---- DELETES ----
+-----------------
+
+-- name: DeleteTransactionByID :exec
+DELETE FROM "order"
+WHERE id = @id::INTEGER;
+
+-----------------
+---- DELETES ----
+-----------------
+
+-----------------
 ---- SELECTS ----
 -----------------
 

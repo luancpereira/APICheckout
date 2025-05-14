@@ -65,5 +65,6 @@ func (s Server) setupRouterV1() {
 	authRoutes.POST("/api/checkout", checkout.InsertTransaction)
 	authRoutes.GET("/api/checkout/transactions/country/:country", checkout.GetList)
 	authRoutes.GET("/api/checkout/transactions/:transactionID/country/:country", checkout.GetByID)
+	authRoutes.DELETE("/api/checkout/transactions/:transactionID", checkout.DeleteTransaction)
 
 }

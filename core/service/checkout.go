@@ -58,6 +58,25 @@ funcs for creations
 ******/
 
 /*****
+funcs for delete
+******/
+
+func (c Checkout) DeleteTransactionByID(transactionID int32) (err error) {
+
+	err = database.DB_QUERIER.DeleteTransactionByID(context.Background(), transactionID)
+	if err != nil {
+		err = database.Utils{}.CoreErrorDatabase(err)
+		return
+	}
+
+	return
+}
+
+/*****
+funcs for delete
+******/
+
+/*****
 funcs for gets
 ******/
 

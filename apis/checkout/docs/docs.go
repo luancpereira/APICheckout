@@ -170,6 +170,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/checkout/transactions/{transactionID}": {
+            "delete": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Checkout Orders"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "transactionID",
+                        "name": "transactionID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Exception"
+                        }
+                    }
+                }
+            }
+        },
         "/api/checkout/transactions/{transactionID}/country/{country}": {
             "get": {
                 "security": [

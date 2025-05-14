@@ -10,6 +10,24 @@ import (
 	"time"
 )
 
+const deleteTransactionByID = `-- name: DeleteTransactionByID :exec
+
+
+DELETE FROM "order"
+WHERE id = $1::INTEGER
+`
+
+// ---------------
+// -- INSERTS ----
+// ---------------
+// ---------------
+// -- DELETES ----
+// ---------------
+func (q *Queries) DeleteTransactionByID(ctx context.Context, id int32) error {
+	_, err := q.exec(ctx, q.deleteTransactionByIDStmt, deleteTransactionByID, id)
+	return err
+}
+
 const insertTransaction = `-- name: InsertTransaction :one
 
 INSERT INTO "order" (
@@ -101,7 +119,7 @@ type SelectTransactionsRow struct {
 }
 
 // ---------------
-// -- INSERTS ----
+// -- DELETES ----
 // ---------------
 // ---------------
 // -- SELECTS ----
