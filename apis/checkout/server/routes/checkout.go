@@ -41,6 +41,14 @@ func (Checkout) InsertTransaction(ctx *gin.Context) {
 	commonsServer.Response{}.ResponseCreated(ctx, ID)
 }
 
+/*****
+funcs for posts
+******/
+
+/*****
+funcs for deletes
+******/
+
 // godoc
 //
 //	@Tags		Checkout Orders
@@ -66,7 +74,7 @@ func (Checkout) DeleteTransaction(ctx *gin.Context) {
 }
 
 /*****
-funcs for posts
+funcs for deletes
 ******/
 
 /*****
