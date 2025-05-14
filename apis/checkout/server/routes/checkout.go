@@ -6,6 +6,7 @@ import (
 	"github.com/luancpereira/APICheckout/apis/checkout/server/model/request"
 	"github.com/luancpereira/APICheckout/apis/checkout/server/model/response"
 	commonsServer "github.com/luancpereira/APICheckout/apis/commons/server"
+	"github.com/luancpereira/APICheckout/core/database/sqlc"
 	coreError "github.com/luancpereira/APICheckout/core/errors"
 	"github.com/luancpereira/APICheckout/core/service"
 )
@@ -75,6 +76,46 @@ func (Checkout) DeleteTransaction(ctx *gin.Context) {
 
 /*****
 funcs for deletes
+******/
+
+/*****
+funcs for puts
+******/
+
+// godoc
+//
+//	@Tags		Checkout Orders
+//	@Produce	json
+//	@Security	JWT
+//	@Param		body	body	request.PutTransaction	true	"Body JSON"
+//	@Success	204
+//	@Failure	400	{object}	response.Exception
+//	@Router		/api/checkout/transactions [put]
+func (Checkout) UpdateTransaction(ctx *gin.Context) {
+	var req request.PutTransaction
+	err := commonsServer.Param{}.ParseBody(ctx, &req)
+	if err != nil {
+		return
+	}
+
+	checkoutParams := sqlc.UpdateTransactionParams{
+		ID:               int32(req.ID),
+		Description:      req.Description,
+		TransactionDate:  req.TransactionDate,
+		TransactionValue: req.TransactionValue,
+	}
+
+	err = service.Checkout{}.UpdateTransactionByID(checkoutParams)
+	if err != nil {
+		commonsServer.Response{}.ResponseBadRequest(ctx, err)
+		return
+	}
+
+	commonsServer.Response{}.ResponseNoContent(ctx)
+}
+
+/*****
+funcs for puts
 ******/
 
 /*****

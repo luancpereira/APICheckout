@@ -58,6 +58,32 @@ funcs for creations
 ******/
 
 /*****
+funcs for puts
+******/
+
+func (c Checkout) UpdateTransactionByID(params sqlc.UpdateTransactionParams) (err error) {
+
+	params = sqlc.UpdateTransactionParams{
+		Description:      params.Description,
+		TransactionDate:  params.TransactionDate,
+		TransactionValue: params.TransactionValue,
+		ID:               params.ID,
+	}
+
+	err = database.DB_QUERIER.UpdateTransaction(context.Background(), params)
+	if err != nil {
+		err = database.Utils{}.CoreErrorDatabase(err)
+		return
+	}
+
+	return
+}
+
+/*****
+funcs for puts
+******/
+
+/*****
 funcs for delete
 ******/
 

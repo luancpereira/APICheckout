@@ -48,6 +48,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.selectUserIDByEmailStmt, err = db.PrepareContext(ctx, selectUserIDByEmail); err != nil {
 		return nil, fmt.Errorf("error preparing query SelectUserIDByEmail: %w", err)
 	}
+	if q.updateTransactionStmt, err = db.PrepareContext(ctx, updateTransaction); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateTransaction: %w", err)
+	}
 	return &q, nil
 }
 
@@ -91,6 +94,11 @@ func (q *Queries) Close() error {
 	if q.selectUserIDByEmailStmt != nil {
 		if cerr := q.selectUserIDByEmailStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing selectUserIDByEmailStmt: %w", cerr)
+		}
+	}
+	if q.updateTransactionStmt != nil {
+		if cerr := q.updateTransactionStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateTransactionStmt: %w", cerr)
 		}
 	}
 	return err
@@ -140,6 +148,7 @@ type Queries struct {
 	selectTransactionsTotalStmt *sql.Stmt
 	selectUserForLoginStmt      *sql.Stmt
 	selectUserIDByEmailStmt     *sql.Stmt
+	updateTransactionStmt       *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
@@ -154,5 +163,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		selectTransactionsTotalStmt: q.selectTransactionsTotalStmt,
 		selectUserForLoginStmt:      q.selectUserForLoginStmt,
 		selectUserIDByEmailStmt:     q.selectUserIDByEmailStmt,
+		updateTransactionStmt:       q.updateTransactionStmt,
 	}
 }

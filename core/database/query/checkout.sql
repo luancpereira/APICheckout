@@ -30,6 +30,23 @@ WHERE id = @id::INTEGER;
 -----------------
 
 -----------------
+---- UPDATES ----
+-----------------
+
+-- name: UpdateTransaction :exec
+UPDATE "order"
+SET
+    description = @description::VARCHAR,
+    transaction_date = @transaction_date::TIMESTAMP,
+    transaction_value = @transaction_value::FLOAT
+WHERE
+    id = @id::INTEGER;
+
+-----------------
+---- UPDATES ----
+-----------------
+
+-----------------
 ---- SELECTS ----
 -----------------
 

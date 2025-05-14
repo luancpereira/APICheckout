@@ -26,7 +26,7 @@ type Querier interface {
 	InsertUser(ctx context.Context, arg InsertUserParams) (InsertUserRow, error)
 	SelectTransactionByID(ctx context.Context, id int64) (SelectTransactionByIDRow, error)
 	//---------------
-	//-- DELETES ----
+	//-- UPDATES ----
 	//---------------
 	//---------------
 	//-- SELECTS ----
@@ -41,6 +41,13 @@ type Querier interface {
 	//---------------
 	SelectUserForLogin(ctx context.Context, email string) (SelectUserForLoginRow, error)
 	SelectUserIDByEmail(ctx context.Context, email string) (int64, error)
+	//---------------
+	//-- DELETES ----
+	//---------------
+	//---------------
+	//-- UPDATES ----
+	//---------------
+	UpdateTransaction(ctx context.Context, arg UpdateTransactionParams) error
 }
 
 var _ Querier = (*Queries)(nil)

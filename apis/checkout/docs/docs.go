@@ -96,6 +96,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/checkout/transactions": {
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Checkout Orders"
+                ],
+                "parameters": [
+                    {
+                        "description": "Body JSON",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.PutTransaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Exception"
+                        }
+                    }
+                }
+            }
+        },
         "/api/checkout/transactions/country/{country}": {
             "get": {
                 "security": [
@@ -329,6 +366,23 @@ const docTemplate = `{
                 },
                 "repeat_password": {
                     "type": "string"
+                }
+            }
+        },
+        "request.PutTransaction": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "transaction_date": {
+                    "type": "string"
+                },
+                "transaction_value": {
+                    "type": "number"
                 }
             }
         },

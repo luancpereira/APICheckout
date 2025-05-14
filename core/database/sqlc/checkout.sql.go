@@ -119,7 +119,7 @@ type SelectTransactionsRow struct {
 }
 
 // ---------------
-// -- DELETES ----
+// -- UPDATES ----
 // ---------------
 // ---------------
 // -- SELECTS ----
@@ -167,4 +167,39 @@ func (q *Queries) SelectTransactionsTotal(ctx context.Context, transactionDate s
 	var total int64
 	err := row.Scan(&total)
 	return total, err
+}
+
+const updateTransaction = `-- name: UpdateTransaction :exec
+
+
+UPDATE "order"
+SET
+    description = $1::VARCHAR,
+    transaction_date = $2::TIMESTAMP,
+    transaction_value = $3::FLOAT
+WHERE
+    id = $4::INTEGER
+`
+
+type UpdateTransactionParams struct {
+	Description      string
+	TransactionDate  time.Time
+	TransactionValue float64
+	ID               int32
+}
+
+// ---------------
+// -- DELETES ----
+// ---------------
+// ---------------
+// -- UPDATES ----
+// ---------------
+func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionParams) error {
+	_, err := q.exec(ctx, q.updateTransactionStmt, updateTransaction,
+		arg.Description,
+		arg.TransactionDate,
+		arg.TransactionValue,
+		arg.ID,
+	)
+	return err
 }
